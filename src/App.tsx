@@ -1,122 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useCallback, useState } from 'react';
+import { Game, type GameResult } from './game/Game';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+type Screen = 'start' | 'playing' | 'result';
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+const RESULT_TIERS = [
+  { min: 0, text: '몸 풀기만 했네요 🫠' },
+  { min: 20, text: '그럭저럭 헤엄쳤어요 🏊' },
+  { min: 50, text: '제법인데요? 체감온도 -1도' },
+  { min: 100, text: '찐 물개 등극 🦭 체감온도 -3도' },
+  { min: 200, text: '이 정도면 국가대표감 🥇 체감온도 -5도' },
+];
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function getResultCopy(distanceM: number) {
+  let text = RESULT_TIERS[0].text;
+  for (const tier of RESULT_TIERS) {
+    if (distanceM >= tier.min) text = tier.text;
+  }
+  return text;
 }
 
-export default App
+function App() {
+  const [screen, setScreen] = useState<Screen>('start');
+  const [result, setResult] = useState<GameResult | null>(null);
+
+  const handleGameOver = useCallback((r: GameResult) => {
+    setResult(r);
+    setScreen('result');
+  }, []);
+
+  return (
+    <div className="app-shell">
+      {screen === 'start' && (
+        <div className="screen start-screen">
+          <h1>오늘도 하찮게 수영중</h1>
+          <p className="subtitle">탭해서 헤엄치고, 손 떼면 가라앉아요</p>
+          <div className="hero-emoji">🏊‍♀️🌊</div>
+          <button
+            type="button"
+            className="primary-btn"
+            onClick={() => setScreen('playing')}
+          >
+            시작하기
+          </button>
+        </div>
+      )}
+
+      {screen === 'playing' && <Game onGameOver={handleGameOver} />}
+
+      {screen === 'result' && result && (
+        <div className="screen result-screen">
+          <h1>{result.distanceM}m 헤엄쳤어요!</h1>
+          <p className="subtitle">{getResultCopy(result.distanceM)}</p>
+          <div className="result-stats">
+            <span>🍦 {result.itemsCollected}개 수집</span>
+            <span>총점 {result.score}</span>
+          </div>
+          <button
+            type="button"
+            className="primary-btn"
+            onClick={() => setScreen('playing')}
+          >
+            다시하기
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
