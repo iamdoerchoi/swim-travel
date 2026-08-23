@@ -3,7 +3,7 @@ import { defineConfig } from '@apps-in-toss/web-framework/config';
 export default defineConfig({
   appName: 'swim-travel',
   brand: {
-    primaryColor: '#3182F6', // 화면에 노출될 앱의 기본 색상으로 바꿔주세요.
+    primaryColor: '#0A7EA4', // 게임 배경 그라데이션과 맞춘 바다색
   },
   permissions: [],
   webBundleDir: 'dist',
