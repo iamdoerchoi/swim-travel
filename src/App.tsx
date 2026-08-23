@@ -35,7 +35,10 @@ function App() {
         <div className="screen start-screen">
           <h1>오늘도 하찮게 수영중</h1>
           <p className="subtitle">탭해서 헤엄치고, 손 떼면 가라앉아요</p>
-          <div className="hero-emoji">🏊‍♀️🌊</div>
+          <div className="hero-emoji">
+            <span className="swimmer">🏊‍♀️</span>
+            <span className="wave">🌊</span>
+          </div>
           <button
             type="button"
             className="primary-btn"
